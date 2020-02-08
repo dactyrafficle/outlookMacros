@@ -5,36 +5,42 @@
 
 Sub colorizeActiveMailItem()
 
-    Dim NewMail As MailItem, oInspector As Inspector
+  Dim NewMail As MailItem, oInspector As Inspector
     
-    'i think a new mail item gets thrown into the active inspector
-    Set oInspector = Application.ActiveInspector
+  'an inspector object is just the window in outlook that has an item
+	'its just the window - not the contents
+  'this line returns the topmost window in outlook
+	Set oInspector = Application.ActiveInspector
+
+  If oInspector Is Nothing Then
+    MsgBox "No active inspector."
+    Exit Sub
+  Else
     
-    
-    If oInspector Is Nothing Then
-        MsgBox "No active inspector"
+    'an inspector object can contain mail items
+	  'Application.ActiveInspector.CurrentItem -> gets the current mail item inside the topmost window
+    Set NewMail = oInspector.CurrentItem
+        
+    'interesting: try running the macro on an open window containing a sent mail, open mail, received mail
+		'Application.ActiveInspector.CurrentItem.Sent (boolean)
+    If NewMail.Sent Then
+      MsgBox "This is not an editable email"
+      Exit Sub
     Else
-    
-        'is this only one item?
-        Set NewMail = oInspector.CurrentItem
         
-        'intersting thing
-        If NewMail.Sent Then
-            MsgBox "This is not an editable email"
-        Else
-        
-            'isWordMail must be binary to make sure we can use COM
-            If oInspector.IsWordMail Then
+      'Application.ActiveInspector.IsWordMail (boolean)
+      'if true, we can use Com, just like if it was a MS Word application
+      If oInspector.IsWordMail Then
             
-                ' i need to draw this thing out
-                Dim oDoc As Object, oWrdApp As Object, oSelection As Object
-                Set oDoc = oInspector.WordEditor
-                Set oWrdApp = oDoc.Application
-                Set oSelection = oWrdApp.Selection
+        Dim oDoc As Object, oWrdApp As Object, oSelection As Object
+        'Set oDoc = oInspector.WordEditor
+        'Set oWrdApp = oDoc.Application
+        'Set oSelection = oWrdApp.Selection
+        Set oSelection = oInspector.WordEditor.Application.Selection
                 
-                Dim n As Integer
-                n = Len(oSelection.Document.content)
-                MsgBox n
+        Dim n As Long
+        n = Len(oSelection.Document.content)
+        MsgBox n
                 
                 
                 Dim minSize, maxSize As Integer
