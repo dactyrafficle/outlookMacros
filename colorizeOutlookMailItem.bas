@@ -19,9 +19,15 @@ Sub colorizeActiveMailItem()
   End If
     
   'an inspector object can contain mail items
+  'the .BodyFormat shouldnt matter
   'Application.ActiveInspector.CurrentItem -> gets the current mail item inside the topmost window
   Set NewMail = oInspector.CurrentItem
-    
+    'NewMail.BodyFormat
+    ' olFormatHTML
+    ' olFormatPlain
+    ' olFormatRichText
+    ' olFormatUnspecified
+ 
   'interesting: try running the macro on an open window containing a sent mail, open mail, received mail
   'Application.ActiveInspector.CurrentItem.Sent (boolean)
   If NewMail.Sent Then
@@ -73,15 +79,11 @@ Sub colorizeActiveMailItem()
   
   Else
   
-    ' No object model to work with. Must manipulate raw text.
-    Select Case NewMail.BodyFormat
-    Case olFormatPlain, olFormatRichText, olFormatUnspecified
-      NewMail.Body = NewMail.Body & "hi!"
-    Case olFormatHTML
-      NewMail.HTMLBody = NewMail.HTMLBody & "<p>" & "hi!" & " among other things </p>"
-    End Select
+    MsgBox "This isn't a word mail object so I can't work with it using COM"
+    Exit Sub
   
   End If 'closing isWordMail if stmt
 
 End Sub
+
 
